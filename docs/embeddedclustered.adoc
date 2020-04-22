@@ -1,7 +1,7 @@
 == Embeded Cache with a cluster
 In this lab we are going to cluster the embedded cache. Inifinispan does this very nicely. We do not need to change a lot of configuration to achieve this.
 After configuration, we will deploy our application to Openshift and see how the cluster will work in a cloud environment. 
-Following diagram illustrates the topology we want to achieve. Although clustering cache nodes can be in 100s, we will start with a couple of them and see how we can get the feature set we need for a cache.
+The following diagram illustrates the topology we want to achieve. Although clustering cache nodes can be in the 100s, we will start with a couple of them and see how we can get the feature set we need for a cache.
 
 image::clusteredembeddedcache.png[Caching, 900]
 
@@ -23,14 +23,14 @@ Copy the and replace the onStart method in our ScoreService.java
 [source, java, role="copypaste"]
 ----
     void onStart(@Observes @Priority(value = 1) StartupEvent ev){
-        GlobalConfigurationBuilder global = GlobalConfigurationBuilder.defaultClusteredBuilder();
-        global.transport().clusterName("ScoreCard");
+        GlobalConfigurationBuilder global = GlobalConfigurationBuilder.defaultClusteredBuilder(); <1>
+        global.transport().clusterName("ScoreCard"); <2>
         cacheManager = new DefaultCacheManager(global.build());
 
         ConfigurationBuilder config = new ConfigurationBuilder();
 
         config.expiration().lifespan(5, TimeUnit.MINUTES)
-                .clustering().cacheMode(CacheMode.DIST_SYNC);
+                .clustering().cacheMode(CacheMode.DIST_SYNC); <3>
 
         cacheManager.defineConfiguration("scoreboard", config.build());
         scoreCache = cacheManager.getCache("scoreboard");
