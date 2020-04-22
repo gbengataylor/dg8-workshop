@@ -1,17 +1,17 @@
-What could be cases where you want to use Cache; Lets take a moment and think about it. Where do you think you could use cache? 
-Well there could be limitless answers to this question; Some common usecases are listed below
+What could be the cases where you want to use Cache? Lets take a moment and think about it. Where do you think you could use cache? 
+Well there could be limitless answers to this question; Some common use cases are listed below
 
-- Lookup Data; if you have an app, that needs some user profile data etc, thats unecessary to pole everytime, and it doesnt change much
-- Latency or bulk; you might have a service or database that takes alot of time to load some of the data.
-- Traffic; you might have loads of users and trends are spiking
-- Session Storage; Storing your webapp sessions, this could be carts etc, that you can use to scale your application
-- Global Counters; You might want to create distributed keys accross a distributed dataset. Use this to update and fetch data. 
+- Lookup Data: if you have an app that needs some user profile data etc, that is unecessary to poll everytime, and it doesn't change much
+- Latency or bulk: you might have a service or database that takes alot of time to load some of the data.
+- Traffic: you might have loads of users and trends spiking
+- Session Storage: Storing your webapp sessions; this could be carts etc, that you can use to scale your application
+- Global Counters: You might want to create distributed keys across a distributed dataset and use this to update and fetch data. 
 
 image::embeddedcache.png[Caching, 900]
 
-The above figure depicts a common scenario when you dont want to use a networked dataset that could be slow and with high latency, but rather use an inmemory cache. In this case the in-memory cache becomes the front for the data. 
+The above figure depicts a common scenario where you don't want to use a networked dataset that could be slow and exhibit high latency, but rather use an in-memory cache. In this case the in-memory cache becomes the front for the data. 
 
-This lab is about an embedded or local cache, also a common usecase for applications.  What is an Embedded Cache in Red Hat Data Grid?
+This lab is about an embedded or local cache, also a common use case for applications.  What is an Embedded Cache in Red Hat Data Grid?
 
 === Embedded Cache, Some basics
 The CacheManager is Red Hat Data Grid’s main entry point. You can use a CacheManager to
@@ -46,12 +46,12 @@ manager.stop();
 This will ensure all caches within its scope are properly stopped, thread pools are shutdown. If the CacheManager was clustered it will also leave the cluster gracefully. 
 
 == Your first service with Caching
-One of the common usecases for a Cache is to keep most used data in memory. Example having a Scoreboard in the cache. Lets assume theres a webpage that keeps the Score card for a round played by players on different tours. Now since this website expects people coming to check the top scores for example, or maybe based on a country etc. The best approach would be store this information in a cache rather then polling that information from different webservices or different databases as an example. 
+One of the common use cases for a Cache is to keep most used data in memory. For example, having a Scoreboard in the cache. Lets assume there's a webpage that keeps the Score card for a round played by players on different tours. This website may expect people coming to check the top scores, or maybe based on a country etc. The best approach would be store this information in a cache rather then polling that information from different webservices or different databases as an example. 
 
 In our first service we will do exactly that. We will store this data in our Embedded Cache and understand not only how this works but the different ways of handling cache, getting events from it etc. 
 
 === Project details
-You can choose multiple runtimes to impelement this service, in our case today the example we have taken is with Quarkus. Quarkus is a Kubernetes Native Java stack tailored for OpenJDK HotSpot and GraalVM, crafted from the best of breed Java libraries and standards. Quarkus is also known for some of its cool features e.g Live Coding which we will also use in our labs. It makes it easier to code and see our changes as we do that. 
+You can choose multiple runtimes to impelement this service, in our case today the example we have taken is with Quarkus. Quarkus is a Kubernetes Native Java stack tailored for OpenJDK HotSpot and GraalVM, crafted from the best of breed Java libraries and standards. Quarkus is also known for some of its cool features such as Live Coding which we will also use in our labs. It makes it easier to code and see our changes as we do that. 
 
 Navigate to the project `dg8-embedded-quarkus`
 This is a template project, and you will be writing code into this project.
@@ -134,7 +134,7 @@ Take a look at some of the other methods in the Score class and make yourself fa
 
 
 === Creating a service for caching
-So now that you are familiar with the project template, lets start by creating a service. Todo this open ScoreService.java
+So now that you are familiar with the project template, lets start by creating a service. To do this, open ScoreService.java
 
 Define the following three class level variables
 
@@ -150,9 +150,9 @@ Define the following three class level variables
 
 ----
 
-<1> the scoreCache is an instance of Cache, which will be our point to store and retrieve values. Cache expects <K,V> types, in our case our key is an Object and our actual entry is a Score. Yes the same Score POJO we say earlier. The Cache is also the central interface of Red Hat Data Grid. A Cache provides a highly concurrent, optionally distributed data structure with additional features such as; JTA transaction compatibility, Eviction support for evicting entries from memory to prevent OutOfMemoryErrors, Persisting entries to a CacheLoader, either when they are evicted as an overflow, or all the time, to maintain persistent copies that would withstand server failure or restarts. For convenience, Cache extends ConcurrentMap and implements all methods accordingly. Methods like keySet(), values() and entrySet() produce backing collections in that updates done to them also update the original Cache instance. Certain methods on these maps can be expensive however (prohibitively so when using a distributed cache). The size() and Map.containsValue(Object) methods upon invocation can also be expensive just as well. The reason these methods are expensive are that they take into account entries stored in a configured CacheLoader and remote entries when using a distributed cache.
-<2> the log; straight forward logger incase we want to log something. 
-<3> cacheManager; which is an instance of EmbeddedCacheManager, we inject this into our code using the dependency injection and this is possible due to the extension we added in our maven dependencies. 
+<1> the scoreCache is an instance of Cache, which will be our point to store and retrieve values. Cache expects <K,V> types, in our case our key is an Object and our actual entry is a Score. Yes the same Score POJO we say earlier. The Cache is also the central interface of Red Hat Data Grid. A Cache provides a highly concurrent, optionally distributed data structure with additional features such as: JTA transaction compatibility, Eviction support for evicting entries from memory to prevent OutOfMemoryErrors, Persisting entries to a CacheLoader, either when they are evicted as an overflow, or all the time, to maintain persistent copies that would withstand server failure or restarts. For convenience, Cache extends ConcurrentMap and implements all methods accordingly. Methods like keySet(), values() and entrySet() produce backing collections in that updates done to them also update the original Cache instance. Certain methods on these maps can be expensive however (prohibitively so when using a distributed cache). The size() and Map.containsValue(Object) methods upon invocation can also be expensive just as well. The reason these methods are expensive are that they take into account entries stored in a configured CacheLoader and remote entries when using a distributed cache.
+<2> the log: straightforward logger incase we want to log something. 
+<3> cacheManager: which is an instance of EmbeddedCacheManager. We inject this into our code using the dependency injection and this is possible due to the extension we added in our maven dependencies. 
 
 
 Next let's create some accessor methods for our service. 
@@ -182,7 +182,7 @@ Next let's create some accessor methods for our service.
 <3> We are deleting an entry from our cache
 <4> Finally we want to get 1 entry from our cache. 
 
-These are simple accessor methods, one thing you might have noticed is the use of the method `getKey`. This method described as follows has one simple task i.e. to get us the key, which in our case we use as a concatenated string of playerId+course. Since entry always has both of these values we concatenate them here. 
+These are simple accessor methods. One thing you might have noticed is the use of the method `getKey`. This method described as follows has one simple task i.e. to get us the key, which in our case we use as a concatenated string of playerId+course. Since entry always has both of these values we concatenate them here. 
 
 Add the following methods to your class as well. 
 
@@ -204,12 +204,13 @@ Add the following methods to your class as well.
 Perfect! Almost to our final step for this service. What we are missing is initialization of our CacheManager and then we need to ask the CacheManager to give us a new cache. 
 
 The CacheManager has many purposes:
+
 - acts as a container for caches and controls their lifecycle
 - manages global configuration and common data structures and resources (e.g. thread pools)
 - manages clustering
 
 A CacheManager is a fairly heavy-weight component, and you will probably want to initialize it early on in your application lifecycle.
-For that reason we use the onStart method in this Service to ensure that the CacheManager and Cache are both created at startup. This also benefits us when we change this to clustering mode, more on that in our next lab. 
+For that reason we use the onStart method in this Service to ensure that the CacheManager and Cache are both created at startup. This also benefits us when we change this to clustering mode; more on that in our next lab. 
 
 
 [source, java, role="copypaste"]
@@ -261,7 +262,7 @@ Lets implement the create end point, here we are simply calling the save functio
     }
 ----
 
-And we also want to be able to get one entry from our cache. following method will do that by calling the scoreService.findById
+And we also want to be able to get one entry from our cache. The following method will do that by calling the scoreService.findById
 [source, java, role="copypaste"]
 ----
     @GET
@@ -280,7 +281,7 @@ And we also want to be able to get one entry from our cache. following method wi
     }
 ----
 
-And incase we wanted to update an entry. that would normally the case when we the player is playing the round. so the score will be updated. 
+And in case we wanted to update an entry. that would normally be the case when the player is playing the round, so the score will be updated. 
 [source, java, role="copypaste"]
 ----
     @PATCH
@@ -361,17 +362,18 @@ and run load.sh , you can run this file
 ----
 
 Hit the URL again on the browser veiw and you will see some scores updated. Now these scores were posted directly 
+
 <1> via our ScoreResource 
 <2> into our ScoreService 
 <3> and passed into the cache
 
 We just created a bunch of POST requests, to create a bunch of scores. 
-The way the algorithm is working is that , we assume the score card is updated after every hole. or at the end. so if you place the data
+The way the algorithm is working is that , we assume the score card is updated after every hole, or at the end. So if you place the data
 
 [source, shell, role="copypaste"]
 ----
 card:5,4,4,4,3,5,0,0,0,0,0,0,0,0,0,0,0,0
-course:Bethapage
+course:Bethpage
 currentHole:6
 playerId:2
 playerName:James
@@ -389,9 +391,9 @@ Its important to know what our key is and its important to find the right combin
 Lets do that, enter this data in the form in your browser view and press save, it will updated James's round score. 
 
 
-If you goto your endpoint/api which should be route of your app/api in the browser you will also see the same JSON data there as well. 
+If you go to your endpoint/api which should be route of your app/api in the browser you will also see the same JSON data there as well. 
 
-So what we have successfully done so far. Read, Write and update our Cache. 
+So what we have successfully done so far: Read, Write and update our Cache. 
 
 Lets move on to the next step and do some more interesing additions to our project. 
 
@@ -402,17 +404,18 @@ Since we are using the Live Coding mode here, at any time if you terminate or re
 
 
 === Expiration of Entries
-Lets assume you are pulling this data off from a database. You might want that it should be removed from the cache after a certain time period. 
+Let's assume you are pulling this data off from a database. You might want that it should be removed from the cache after a certain time period. 
 You can do this by defining this either on the a single entry or the entire cache. By default entries created are immortal and do not have a lifespan or maximum idle time. Using the cache API, mortal entries can be created with lifespans and/or maximum idle times
 
 Expiration is a top-level construct, represented in the configuration as well as in the cache API.
+
 - While eviction is local to each cache instance , expiration is cluster-wide . Expiration lifespan and maxIdle values are replicated along with the cache entry.
 - Maximum idle times for cache entries require additional network messages in clustered environments. For this reason, setting maxIdle in clustered caches can result in slower operation times.
 - Expiration lifespan and maxIdle are also persisted in CacheStores, so this information survives eviction/passivation.
 
 Lets start with doing this for one entry. 
+In Infinispan, entry expiration can happen in two ways:
 
-In Infinispan entry expiration can happen in two ways:
 
 - a certain time after the data was inserted into the cache (i.e. lifespan)
 - a certain time after the data was last accessed (i.e. maximum idle time)
@@ -512,7 +515,7 @@ Both Eviction and Expiration are means of cleaning the cache of unused entries a
 - *maximum idle time* Specifies how long entries can remain idle before they expire. An entry in the cache is idle when no operation is performed with the key. The default value is -1, which is unlimited time.
 
 
-Perfect now we know what eviction and expiration API we have at our disposal and how we can use them in our app. 
+Perfect! Now we know what eviction and expiration API we have at our disposal and how we can use them in our app. 
 
 Add the following line to your ScoreService onStart method; right under the `ConfigurationBuilder` instantiation; in our example below we are going to limit our Cache to only 2 entries, anything above that will not be added to the Cache.
 
@@ -534,7 +537,7 @@ Refresh your browser view right away. and you will see the entries again. But th
 === Listeners
 Red Hat Data Grid offers a listener API, where clients can register for and get notified when events take place. This annotation-driven API applies to 2 different levels: cache level events and cache manager level events.
 
-Events trigger a notification which is dispatched to listeners. Listeners are simple POJO s annotated with @Listener and registered using the methods defined in the Listenable interface.
+Events trigger a notification which is dispatched to listeners. Listeners are simple POJOs annotated with @Listener and registered using the methods defined in the Listenable interface.
 
 Both Cache and CacheManager implement Listenable, which means you can attach listeners to either a cache or a cache manager, to receive either cache-level or cache manager-level notifications.
 
