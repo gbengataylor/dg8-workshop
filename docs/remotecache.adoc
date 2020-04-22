@@ -6,16 +6,16 @@ Hot Rod is a binary TCP protocol that Infinispan offers high-performance client-
 
 === RemoteCache
 RemoteCache as the name suggest is accessed remotely. The Datagrid server will host this remote cache, and clients will connect to this remote cache.
-From a design perspective it gives more flexibility and also allows to have central deployments with multiple caches residing in it; there by making managemetn and operations a bit more simpler. 
+From a design perspective it gives more flexibility and also allows to have central deployments with multiple caches residing in it; thereby making management and operations a bit more simpler. 
 
-There are some symantic differences how Inifinspan/Red Hat Data Grid expose RemoteCache vs EmbeddedCache. The collection methods keySet, entrySet and values are backed by the remote cache. That is that every method is called back into the RemoteCache. This is useful as it allows for the various keys, entries or values to be retrieved lazily, and not requiring them all be stored in the client memory at once if the user does not want. These collections adhere to the Map specification being that add and addAll are not supported but all other methods are supported. One thing to note is the Iterator.remove and Set.remove or Collection.remove methods require more than 1 round trip to the server to operate. You can check out the RemoteCache Javadoc to see more details about these and the other methods.
+There are some semantic differences how Inifinspan/Red Hat Data Grid expose RemoteCache vs EmbeddedCache. The collection methods keySet, entrySet and values are backed by the remote cache. That is that every method is called back into the RemoteCache. This is useful as it allows for the various keys, entries or values to be retrieved lazily, and not requiring them all be stored in the client memory at once if the user does not want. These collections adhere to the Map specification being that add and addAll are not supported but all other methods are supported. One thing to note is the Iterator.remove and Set.remove or Collection.remove methods require more than 1 round trip to the server to operate. You can check out the RemoteCache Javadoc to see more details about these and the other methods.
 
 
 === Project details
-For this example we are going to create a simple web application. it will take some input from a webform and then add the entries into the Cache. 
+For this example we are going to create a simple web application. It will take some input from a webform and then add the entries into the Cache. 
 However in this case we will be using the RemoteCacheManager and we will be using ProtoStream API. All of this with a Quarkus based application. 
 
-So let's get cracking. But first lets checkout the template project.
+So let's get cracking. But first let's checkout the template project.
 
 Navigate to the project `dg8-quarkus-client-example`
 This is a template project, and you will be writing code into this project.
@@ -39,7 +39,7 @@ We will be using the following dependencies to create our service
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-infinispan-client</artifactId>
+      <artifactId>quarkus-infinispan-client</artifactId> <3>
     </dependency>
     <dependency>
 ----
@@ -50,7 +50,7 @@ We will be using the following dependencies to create our service
 
 
 === Protobuf
-Protobuf or Protocol Buffers are a method of serializing structured data. Protocol buffers are a flexible, efficient, automated mechanism for serializing structured data; they are much smaller and simpler in expression. You can easily write and read your structured data to and from a variety of data streams and using a variety of languages. Protobuf is all about structured data, so the first thing to do is to define the structure of your data. This is accomplished by declaring Protobuf message types in .proto files. e.g the game.proto file looks like follows.
+ Protobuf or Protocol buffers are a flexible, efficient, automated mechanism for serializing structured data; they are much smaller and simpler in expression. You can easily write and read your structured data to and from a variety of data streams and using a variety of languages. Protobuf is all about structured data, so the first thing to do is to define the structure of your data. This is accomplished by declaring Protobuf message types in .proto files. For e.g, the src/main.resources/META-INF/game.proto file looks like follows.
 
 [source, protobuf, role="copypaste"]
 ----
@@ -153,6 +153,7 @@ For this open the Init.java and add the following member variables to it.
 ----
 
 You might remember the onStart from our previous lab. We are doing the same thing here. 
+
 <1> we use the xml defined in a String and pass it on to the Red Hat Data Grid server to parse it and create a new cache called games
 <2> then we ask the cacheManager to get the Cache for us or create a new one if it doesnt exist. 
 
@@ -163,7 +164,7 @@ By now we should have a RemoteCacheManager configured, all we need to do now is 
 
 Open up the GameResource.java, this is our REST resource file use the resteasy dependencies. 
 
-In the following code we inject or RemoteCache, and we specify which Remote cache we want by passing the variable GAME_CACHE to it, which we have initialized previously in our Init.java
+In the following code we inject or RemoteCache, and we specify which Remote cache we want by passing the variable GAME_CACHE to it, which we have initialized previously in our Init.java.
 Add this code to the GameResource.java
 
 [source, java, role="copypaste"]
@@ -290,7 +291,7 @@ image::nearcache.png[Near Caching, 900]
 
 
 When should I use it? 
-Near caching can improve the performance of an application when most of the accesses to a given cache are read-only and the accessed dataset is relatively small. When an application is doing lots of writes to a cache, invalidations, evictions and updates to the near cache need to happen. In such a scenario near cache wont be beneficial.
+Near caching can improve the performance of an application when most of the accesses to a given cache are read-only and the accessed dataset is relatively small. When an application is doing lots of writes to a cache, invalidations, evictions and updates to the near cache need to happen. In such a scenario near cache won't be beneficial.
 
 For Quarkus, near caching is disabled by default, but you can enable it by setting the profile config property quarkus.infinispan-client.near-cache-max-entries to a value greater than 0. You can also configure a regular expression so that only a subset of caches have near caching applied through the quarkus.infinispan-client.near-cache-name-pattern attribute.
 
@@ -324,6 +325,7 @@ Notice that any entries that you might have added to the cache prior to this dep
 When using Hibernate ORM in Quarkus, you don’t need to have a persistence.xml resource to configure it. Using such a classic configuration file is an option, but unnecessary unless you have specific advanced needs; so we’ll see first how Hibernate ORM can be configured without a persistence.xml resource.
 
 In Quarkus, you just need to:
+
 - add your configuration settings in application.properties
 - annotate your entities with @Entity and any other mapping annotation as usual
 
