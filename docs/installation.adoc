@@ -46,10 +46,10 @@ Lets start by installing a basic Red Hat Data Grid Cluster.
     apiVersion: infinispan.org/v1
     kind: Infinispan <1>
     metadata:
-    name: datagrid-service <2>
+      name: datagrid-service <2>
     spec:
-    replicas: 2 <3>
-    expose:
+      replicas: 2 <3>
+      expose:
         type: LoadBalancer <4>
 
 ----
